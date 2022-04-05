@@ -161,7 +161,7 @@ public class PathFinding
 	static public int heuristic(Node Start, Node End) 
 	{
 		
-		return (End.x - Start.x) + (End.y - Start.y);
+		return Math.abs(End.x - Start.x) + Math.abs(End.y - Start.y);
 	}
 	
 	//traces back path from Given node using cameFrom Nodes. 
