@@ -3,8 +3,6 @@ import java.awt.Graphics;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.Random;
 
 import javax.swing.*;
 
@@ -13,7 +11,6 @@ import javax.swing.*;
 public class Grid extends JPanel
 {
 	int Size; // Grid Size
-	Random r;
 	float Spacing;
 	int Height;
 	List<Node> openSet  = new ArrayList<Node>(); // Open Nodes that needs to be analyzed.
@@ -28,8 +25,7 @@ public class Grid extends JPanel
 	Grid(int size, int height)
 	{
 		Size = size;
-		r  = new Random(Size);
-		Spacing = (height/Size);
+		Spacing = ((float)height/Size);
 		Height = height;		
 		
 //		for(int i = 1; i < 25;i++)
@@ -76,32 +72,30 @@ public class Grid extends JPanel
 		//Drawing the end Node.
 		if(End != null)
 		{
-			g.setColor(new Color  (100, 100, 255));
+			g.setColor(Color.magenta);
 			g.fillRect(getPixel(End.x), getPixel(End.y), (int) Spacing, (int) Spacing);
 		}
 		//Draw the Start Node.
 		if(Start != null)
 		{
-			g.setColor(new Color(0, 100, 100));
+			g.setColor(new Color(0, 100, 255));
 			g.fillRect(getPixel(Start.x), getPixel(Start.y), (int) Spacing, (int) Spacing);
 		}
 			
 		//Drawing the grid!		
-		int CountX = 1;		// X line counter.
-		int CountY = 1;		// Y line counter.
+		int Count = 1;		// X line counter.
 		
-		//loops to draw lines as fake nodes.
+		//loops to draw lines as Grid.
 		for(int i = 0; i < Size -1; i++) 
 		{
-			g.setColor(Color.BLACK);
-			g.drawLine(0, (int) Spacing * CountX, Height, (int) Spacing * CountX);
-			CountX++;
-			g.drawLine((int) Spacing * CountY, 0, (int) Spacing * CountY, Height);
-			CountY++;
+			g.setColor(Color.darkGray);
+			g.drawLine(0, (int)Math.ceil( Spacing * Count), Height, (int) Math.ceil(Spacing * Count));
+			g.drawLine((int) Math.ceil(Spacing * Count), 0, (int) Math.ceil(Spacing * Count), Height);
+			Count++;
 		}
 	}
 	
-	//Voids for node functionalities.
+	//Functions for node functionalities.
 	
 	//Get index of node on grid from its Pixels.
 	public int[] getIndex(int x, int y) 
@@ -131,7 +125,7 @@ public class Grid extends JPanel
 			indexY++;
 		}
 		
-		return new int[] {indexX};
+		return new int[] {indexX, indexY};
 	}
 	//Version of getIndex with one input
 	public int getIndex(int x) 
@@ -231,6 +225,20 @@ public class Grid extends JPanel
 			this.repaint();
 		}
 	}
+	void removeWalls(Node n, boolean t)
+	{
+		if(!PathFinding.isRunning && !PathFinding.Completed)
+		{
+			for(int i = 0; i< Walls.size();i++)
+			{
+				if(Walls.get(i).x == getIndex(n.x) && Walls.get(i).y == getIndex(n.y))
+				{
+					Walls.remove(i);
+				}
+			}
+			this.repaint();
+		}
+	}
 	//Checks for Given node in the given list.
 	boolean check(List<Node> arr, Node node)
 	{
@@ -252,6 +260,14 @@ public class Grid extends JPanel
 		}		
 		return false;
 	}
+	void addSize(int x)
+	{
+		if((Size+x >0) && (Size+x <= 100))
+		{Size += x;}
+		Spacing = (Height/Size);	
+		
+		this.repaint();
+		}
 	void GenerateMaze()
 	{
 		if(!PathFinding.isRunning && !PathFinding.Completed)
@@ -262,7 +278,7 @@ public class Grid extends JPanel
 				for(int j = 0; j <= Size ;j++)
 				{
 					
-					if(Math.random() < 0.3)
+					if(Math.random() < 0.4)
 					{
 						addToWalls(new Node(i, j), false);
 					}
@@ -270,6 +286,31 @@ public class Grid extends JPanel
 			}
 			repaint();
 		}
+	}
+	public Node getNode(int x, int y)
+	{
+		for(Node n : closedSet)
+		{
+			if(n.x == x && n.y == y)
+			{
+				return n;
+			}
+		}
+		for(Node n : openSet)
+		{
+			if(n.x == x && n.y == y)
+			{
+				return n;
+			}
+		}
+		for(Node n : Path)
+		{
+			if(n.x == x && n.y == y)
+			{
+				return n;
+			}
+		}
+		return new Node(-1,-1);
 	}
 	
 }
